@@ -1,14 +1,11 @@
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const express = require("express");
 const cors = require('cors');
-
 const app = express();
 const port = 3000;
-
 // Middleware
 app.use(cors());
 app.use(express.json());
-
 const uri = "mongodb+srv://atikur_rahaman:16nov2025safEEr@recipebookserver.ef8t2ty.mongodb.net/?appName=recipeBookServer";
 
 const client = new MongoClient(uri, {
@@ -33,9 +30,9 @@ async function run() {
       res.send("Welcome to the Pizza Menu API");
     });
 
-    app.post("/addPizza", async (req, res) => {
-      const newPizza = req.body;
-      const result = await myColl.insertOne(newPizza);
+    app.post("/addRecipe", async (req, res) => {
+      const newRecipe = req.body;
+      const result = await myColl.insertOne(newRecipe);
       res.send(result);
     });
 
