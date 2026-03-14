@@ -2,7 +2,7 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const express = require("express");
 const cors = require('cors');
 const app = express();
-const port = 3000;
+const port = 5000;
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -21,7 +21,7 @@ async function run() {
     // Connect once when the server starts 
     await client.connect();
     const myDB = client.db("myDB");
-    const myColl = myDB.collection("pizzaMenu");
+    const myColl = myDB.collection("myRecipes");
 
     console.log("Connected to MongoDB!");
 
@@ -31,7 +31,9 @@ async function run() {
     });
 
     app.post("/addRecipe", async (req, res) => {
+      // console.log(req.body); // Log the incoming request body for debugging
       const newRecipe = req.body;
+      console.log(newRecipe);
       const result = await myColl.insertOne(newRecipe);
       res.send(result);
     });
