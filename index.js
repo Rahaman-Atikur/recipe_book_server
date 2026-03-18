@@ -1,53 +1,56 @@
+require('dotenv').config();
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const express = require("express");
 const cors = require('cors');
+
 const app = express();
-const port = 5000;
-// Middleware
+const port = process.env.PORT || 5000;
+
 app.use(cors());
 app.use(express.json());
-const uri = "mongodb+srv://atikur_rahaman:16nov2025safEEr@recipebookserver.ef8t2ty.mongodb.net/?appName=recipeBookServer";
+console.log(process.env.DB_USER,process.env.DB_PASSWORD);
+
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@recipebookserver.ef8t2ty.mongodb.net/?appName=recipeBookServer`;
 
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
+  tls: true
 });
 
 async function run() {
   try {
-    // Connect once when the server starts 
-    await client.connect();
+    // await client.connect();
+
     const myDB = client.db("myDB");
     const myColl = myDB.collection("myRecipes");
 
-    console.log("Connected to MongoDB!");
+    // console.log("Connected to MongoDB!");
 
-    // Route definition [cite: 7, 24]
     app.get("/", (req, res) => {
       res.send("Welcome to the Pizza Menu API");
     });
 
     app.post("/addRecipe", async (req, res) => {
-      // console.log(req.body); // Log the incoming request body for debugging
-      const newRecipe = req.body;
-      console.log(newRecipe);
-      const result = await myColl.insertOne(newRecipe);
+      const result = await myColl.insertOne(req.body);
       res.send(result);
     });
 
-    // Start the Express server inside the try block
+    app.get("/allRecipes", async (req, res) => {
+      const result = await myColl.find().toArray();
+      res.send(result);
+    });
+
     app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
+      // console.log(`Server running on port ${port}`);
     });
 
   } catch (error) {
     console.error("Connection error:", error);
-  } 
-  // REMOVED: The finally { client.close() } block. 
-  // In a web server, we want the connection to stay open.
+  }
 }
 
-run().catch(console.dir);
+run();
